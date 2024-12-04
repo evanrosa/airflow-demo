@@ -1,48 +1,64 @@
-Overview
-========
+# Project README
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+## Overview
 
-Project Contents
-================
+This project is a demonstration of an ETL (Extract, Transform, Load) pipeline using Apache Airflow, Apache Spark, and MinIO. The pipeline is designed to fetch, process, and store stock market data for a specific stock symbol. The project showcases the integration of various technologies to automate data workflows and is structured to be modular and scalable.
 
-Your Astro project contains the following files and folders:
+## Project Structure
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
+- **dags**: Contains the Airflow DAGs that define the workflow for the ETL process.
+- **include**: Contains additional Python scripts used by the DAGs.
+- **spark/notebooks**: Contains the Spark application for data transformation.
+- **Dockerfile**: Defines the Docker image for running the Spark application.
 
-Deploy Your Project Locally
-===========================
+## Workflow Description
 
-1. Start Airflow on your local machine by running 'astro dev start'.
+The ETL pipeline is orchestrated by an Airflow DAG, which consists of several tasks:
 
-This command will spin up 4 Docker containers on your machine, each for a different Airflow component:
+1. **API Availability Check**:
 
-- Postgres: Airflow's Metadata Database
-- Webserver: The Airflow component responsible for rendering the Airflow UI
-- Scheduler: The Airflow component responsible for monitoring and triggering tasks
-- Triggerer: The Airflow component responsible for triggering deferred tasks
+   - A sensor task checks the availability of the stock API to ensure data can be fetched.
 
-2. Verify that all 4 Docker containers were created by running 'docker ps'.
+2. **Fetch Stock Prices**:
 
-Note: Running 'astro dev start' will start your project with the Airflow Webserver exposed at port 8080 and Postgres exposed at port 5432. If you already have either of those ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
+   - A Python task fetches the stock prices for AAPL from a specified API.
 
-3. Access the Airflow UI for your local Airflow project. To do so, go to http://localhost:8080/ and log in with 'admin' for both your Username and Password.
+3. **Store Prices in MinIO**:
 
-You should also be able to access your Postgres Database at 'localhost:5432/postgres'.
+   - The fetched data is stored in a MinIO bucket as a JSON file.
 
-Deploy Your Project to Astronomer
-=================================
+4. **Format Prices with Spark**:
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
+   - A DockerOperator runs a Spark application to transform the stored JSON data into a structured CSV format.
 
-Contact
-=======
+5. **End Task**:
+   - Marks the completion of the DAG.
 
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+## Spark Application
+
+The Spark application is responsible for transforming the raw JSON data into a structured CSV format. It performs the following operations:
+
+- Reads the JSON data from MinIO.
+- Explodes and zips arrays to flatten the data structure.
+- Writes the transformed data back to MinIO as a CSV file.
+
+## Docker Configuration
+
+The Spark application runs inside a Docker container, which is configured to include necessary dependencies for accessing MinIO. The Dockerfile specifies the base image and additional JAR files required for Hadoop S3A support.
+
+## Running the Project Locally
+
+1. **Start Airflow**:
+
+   - Use the command `astro dev start` to spin up the necessary Docker containers for Airflow components.
+
+2. **Access Airflow UI**:
+
+   - Navigate to `http://localhost:8080/` and log in with the default credentials (`admin`/`admin`).
+
+3. **Trigger the DAG**:
+   - In the Airflow UI, trigger the `stock_market` DAG to start the ETL process.
+
+## Conclusion
+
+This project demonstrates a simple yet effective ETL pipeline using modern data engineering tools. It highlights the use of Airflow for orchestration, Spark for data processing, and MinIO for storage, providing a foundation for more complex data workflows.
