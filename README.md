@@ -75,32 +75,3 @@ The diagram illustrates the ETL process flow:
 ## Conclusion
 
 This project demonstrates a simple yet effective ETL pipeline using modern data engineering tools. It highlights the use of Airflow for orchestration, Spark for data processing, and MinIO for storage, providing a foundation for more complex data workflows.
-
-## Code References
-
-- **DAG Definition**:
-
-  ```python:dags/stock_market.py
-  startLine: 1
-  endLine: 122
-  ```
-
-- **Spark Application**:
-
-  ```python:spark/notebooks/stock_transform/stock_transform.py
-  startLine: 1
-  endLine: 55
-  ```
-
-- **Dockerfile**:
-
-  ```dockerfile:spark/notebooks/stock_transform/Dockerfile
-  startLine: 1
-  endLine: 15
-  ```
-
-- **Tasks**:
-  ```python:include/stock_market/tasks.py
-  startLine: 1
-  endLine: 53
-  ```
