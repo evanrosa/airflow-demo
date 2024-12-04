@@ -1,8 +1,10 @@
 # Project README
 
+### This project is for demo purposes only. If used, please update creds with env variables.
+
 ## Overview
 
-This project is a demonstration of an ETL (Extract, Transform, Load) pipeline using Apache Airflow, Apache Spark, and MinIO. The pipeline is designed to fetch, process, and store stock market data for a specific stock symbol. The project showcases the integration of various technologies to automate data workflows and is structured to be modular and scalable.
+This project is a demonstration of an ETL (Extract, Transform, Load) pipeline using Apache Airflow, Apache Spark, and MinIO. The pipeline is designed to fetch, process, and store stock market data for a specific stock symbol, AAPL. The project showcases the integration of various technologies to automate data workflows and is structured to be modular and scalable.
 
 ## Project Structure
 
@@ -59,6 +61,48 @@ The Spark application runs inside a Docker container, which is configured to inc
 3. **Trigger the DAG**:
    - In the Airflow UI, trigger the `stock_market` DAG to start the ETL process.
 
+## Diagram Explanation
+
+The diagram illustrates the ETL process flow:
+
+- **Start**: The process begins with an empty operator indicating the start of the DAG.
+- **API Availability Check**: A sensor task checks if the stock API is available.
+- **Fetch Stock Prices**: A Python task retrieves stock prices for AAPL.
+- **Store Prices in MinIO**: The data is stored in MinIO as a JSON file.
+- **Format Prices with Spark**: A DockerOperator runs a Spark job to format the data into CSV.
+- **End**: The process concludes with an empty operator indicating the end of the DAG.
+
+![ETL Process Flow](images/diagram.jpg)
+
 ## Conclusion
 
 This project demonstrates a simple yet effective ETL pipeline using modern data engineering tools. It highlights the use of Airflow for orchestration, Spark for data processing, and MinIO for storage, providing a foundation for more complex data workflows.
+
+## Code References
+
+- **DAG Definition**:
+
+  ```python:dags/stock_market.py
+  startLine: 1
+  endLine: 122
+  ```
+
+- **Spark Application**:
+
+  ```python:spark/notebooks/stock_transform/stock_transform.py
+  startLine: 1
+  endLine: 55
+  ```
+
+- **Dockerfile**:
+
+  ```dockerfile:spark/notebooks/stock_transform/Dockerfile
+  startLine: 1
+  endLine: 15
+  ```
+
+- **Tasks**:
+  ```python:include/stock_market/tasks.py
+  startLine: 1
+  endLine: 53
+  ```
