@@ -72,8 +72,6 @@ The diagram illustrates the ETL process flow:
 - **Format Prices with Spark**: A DockerOperator runs a Spark job to format the data into CSV.
 - **End**: The process concludes with an empty operator indicating the end of the DAG.
 
-![ETL Process Flow](images/diagram.jpg)
-
 ## Conclusion
 
 This project demonstrates a simple yet effective ETL pipeline using modern data engineering tools. It highlights the use of Airflow for orchestration, Spark for data processing, and MinIO for storage, providing a foundation for more complex data workflows.
